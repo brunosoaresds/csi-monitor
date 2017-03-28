@@ -1,3 +1,4 @@
 recv_csi
 *.o
 CMakeLists.txt
+outputs/
