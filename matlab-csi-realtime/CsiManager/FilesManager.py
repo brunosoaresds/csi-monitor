@@ -1,6 +1,7 @@
 import time
-import os
 from threading import Thread
+
+from Log import *
 
 
 class FilesManager(Thread):
@@ -14,6 +15,13 @@ class FilesManager(Thread):
         self.filesDir = os.path.dirname(os.path.abspath(__file__)) + '/output_data/'
         self.removalWindow = removalWindow
         self.files = []
+
+        # Creates output_data directory if not exists
+        try:
+            if not os.path.exists(self.filesDir):
+                os.makedirs(self.filesDir)
+        except Exception, e:
+            Log.error('Could not create output_data directory: ' + e.message)
 
     def run(self):
         while True:

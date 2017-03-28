@@ -5,6 +5,8 @@
 #include <limits.h>
 #include <time.h>
 #include <pthread.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #include "csi_collector.h"
 #include "csi_fun.h"
@@ -61,6 +63,13 @@ void *files_cleaner(void *vargp) {
     char files_dir[512];
     sprintf(files_dir, "%s/outputs", get_selfpath());
 
+    // Create output directory if not exists
+    struct stat st = {0};
+    if (stat(files_dir, &st) == -1) {
+        mkdir(files_dir, 0700);
+    }
+
+    // Clean output directory;
     char rm_command[512];
     sprintf(rm_command, "rm %s/*", files_dir);
     system(rm_command);

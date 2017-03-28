@@ -1,11 +1,8 @@
 import socket
-import os
-import select
-import time
-from threading import Thread
 
 from FilesManager import *
 from Log import *
+
 
 class CsiManager(Thread):
     ##
@@ -63,7 +60,7 @@ class CsiManager(Thread):
             startTime = time.time()
             try:
                 self.socket.send('GET_FILES')
-                filesBin = self.socket.recv(1024*60)
+                filesBin = self.socket.recv(1024 * 60)
                 files = filesBin.split('/outputs/')
                 absolutePath = files[0]
                 files = [s.split(absolutePath)[0] for s in files]
@@ -77,7 +74,7 @@ class CsiManager(Thread):
                 absolutePath += '/outputs/'
 
                 if len(files) > 1:
-                    scpCommand = 'scp root@' + self.host + ':' + absolutePath + '\{' + ','.join(files) +\
+                    scpCommand = 'scp root@' + self.host + ':' + absolutePath + '\{' + ','.join(files) + \
                                  '\} ' + self.filesManager.filesDir + ' > /dev/null 2>&1'
                     os.system(scpCommand)
 
