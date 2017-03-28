@@ -179,31 +179,24 @@ function handles = configureCsiManager(hObject, eventdata, handles)
         guidata(handles.csi_realtime_frame, handles);
     end
     
-    % Check if csi manager is running
-    [~, cmdout] = system('ps aux | grep "Main.py" | grep -v grep | awk ''{print $2}''');
-
-    % CsiManager not running... start it
-    csiManagerPort = 5000;
-    if strcmp(cmdout, '') ~= 0
+    % if is not connected to csi manager, start and connect
+    if isfield(handles, 'serverConnection') == 0
         disp('starting CSI MANAGER...');
         csiManagerPort = randi([5000 6000], 1, 1);
         path = strrep(which(mfilename), [mfilename,'.m'], '');
-        
+
         command = [path, 'CsiManager/Main.py --port=', num2str(csiManagerPort), ...
         ' --receiver=', get(handles.csi_receiver, 'String'), ...
         ' --sender=', get(handles.csi_sender, 'String'), ...
         ' & echo $!'];
         [~, pid] = system(command);
-        
+
         % Save the pid of CSI MANAGER
         handles = setfield(handles, 'csiManagerPid', pid);
         guidata(handles.csi_realtime_frame, handles);
-        
+
         pause(5);
-    end
-    
-    % Check if csi manager connection is up
-    if isfield(handles, 'serverConnection') == 0
+        
         disp('Connecting to server...')
         try
             t = tcpip('localhost', csiManagerPort);
@@ -367,12 +360,12 @@ function start_stop_btn_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
     if strcmp(get(hObject, 'String'), 'Start')
-%         if isfield(handles, 'csiReceiverSocket') == 0 || ...
-%             isfield(handles, 'csiSenderSocket') == 0
-%             msgbox('Could not start real time collection, check sender and receiver configurations.', ...
-%                 'Configuration Error', 'error');
-%             return;
-%         end
+        if isfield(handles, 'csiReceiverSocket') == 0 || ...
+            isfield(handles, 'csiSenderSocket') == 0
+            msgbox('Could not start real time collection, check sender and receiver configurations.', ...
+                'Configuration Error', 'error');
+            return;
+        end
         
         handles = configureCsiManager(hObject, eventdata, handles);
         configureSender(hObject, eventdata, handles);
