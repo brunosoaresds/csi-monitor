@@ -280,6 +280,16 @@ function requestRealTimeData(hObject, eventdata, handles)
         updateGraph(handles)
     end
     
+    % Checks if the sender time finished, and stop collection
+    if isfield(handles, 'start_time') == 1
+        elapsedTime = (now - handles.start_time) * 10^5;
+        experimentTime = str2num(get(handles.sender_seconds, 'String'));
+        lastPktCount = str2num(get(handles.last_second_pkt_count, 'String'));
+        if(elapsedTime >= experimentTime && lastPktCount == 0)
+            start_stop_btn_Callback(handles.start_stop_btn, [], handles);
+        end
+    end
+    
 function updateGraph(handles)
     if isfield(handles, 'csiData') ~= 1 || isempty(handles.csiData)
         return;
@@ -369,6 +379,8 @@ function start_stop_btn_Callback(hObject, eventdata, handles)
         
         handles = configureCsiManager(hObject, eventdata, handles);
         configureSender(hObject, eventdata, handles);
+        stop(handles.timer);
+        clear_btn_Callback(hObject, eventdata, handles);
         start(handles.timer);
         
         set(hObject, 'String', 'Stop');
@@ -381,7 +393,10 @@ function start_stop_btn_Callback(hObject, eventdata, handles)
         set(handles.rx, 'enable', 'off');
         set(handles.tx, 'enable', 'off');
         set(handles.export_btn, 'enable', 'off');
-        clear_btn_Callback(hObject, eventdata, handles);
+        
+        % Set the start timestamp
+        handles.start_time = now;
+        guidata(hObject, handles);
     else
         stop(handles.timer);
         set(hObject, 'String', 'Start');

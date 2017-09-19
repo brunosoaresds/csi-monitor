@@ -7,7 +7,7 @@ function ret = pca_filter(data, components)
     [m, n] = size(data);
     
     % Removes the mean (static path) of data
-    data = data - repmat(mean(data), m, 1);
+    %data = data - repmat(mean(data), m, 1);
     
     [coeff, score, latent] = pca(data);
     % Calculates the component reliability
