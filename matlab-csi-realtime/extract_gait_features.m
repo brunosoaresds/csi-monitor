@@ -272,6 +272,104 @@ function [ all_features, energy_signatures, time_slice_features ] = extract_gait
     coeff= pca(nons_csi);
     pca_comps = nons_csi*coeff(:,1:20);
     
+    %Calcule phase
+%     phases_features = [];
+%     for i=1:length(events_indexes)
+%         event = events_indexes{1,i};
+%         start_time = floor(window_size*event(1,1));
+%         end_time = ceil(window_size*event(1,2));
+%         event_in_time = csi_data(:, start_time:end_time).';
+%         event_size = size(event_in_time,1);
+%         event_in_time = event_in_time(1:(floor(event_size/10)*10),:);
+% 
+%         time_slice_features = [];
+%         for j=1:size(event_in_time, 2)
+%             relative_freq = size(event_in_time,1)/10;
+%             s_data = reshape(event_in_time(:,j), relative_freq, []).';
+%             for k=1:size(s_data, 1)
+%                 time_slice_features(end+1,:) = entropy(phase(s_data(k,:)));
+%             end
+%         end
+%         
+%         phase_feature = imresize(reshape(time_slice_features, 1, []), [1 500], 'nearest');
+%         phases_features(i,:) = phase_feature;
+%     end
+%     all_features = phases_features;
+%     return;
+    
+    % Percentile curve
+    percentile_features = [];
+    for i=1:length(events_indexes)
+        event = events_indexes{1,i};
+        e_start_time = floor(event(1,1));
+        e_end_time = ceil(event(1,2));
+
+        start_time = e_start_time;
+        end_time = e_end_time;
+        
+        event_percentile = percentile(:,start_time:end_time);
+        percentile_curves = zeros(3, size(event_percentile,2));
+        for j=1:size(event_percentile, 2)
+            event_p_slice = event_percentile(:,j);
+            perc_25 = find(event_p_slice >= 0.25);
+            perc_50 = find(event_p_slice >= 0.50);
+            perc_95 = find(event_p_slice >= 0.95);
+            if(length(perc_25) > 0)
+                percentile_curves(1,j) = perc_25(1,1);
+            end
+            if(length(perc_50) > 0)
+                percentile_curves(2,j) = perc_50(1,1);
+            end
+            if(length(perc_95) > 0)
+                percentile_curves(3,j) = perc_95(1,1);
+            end
+        end
+        
+        percentile_curves = imresize(percentile_curves, [3 30], 'nearest').';
+        percentile_features(i,:) = reshape(percentile_curves, 1, []);
+    end
+    
+    % Multipath features
+%     multipath_features = [];
+%     for i=1:length(events_indexes)
+%         event = events_indexes{1,i};
+%         start_time = floor(window_size*event(1,1));
+%         end_time = ceil(window_size*event(1,2));
+%         event_in_time = csi_data(:, start_time:end_time);
+%         
+%         ms100_size = frequency/10;
+%         ms100_slices = floor(size(event_in_time,2)/ms100_size);
+%         event_in_time = event_in_time(:, 1:ms100_slices*ms100_size);
+%         event_iffts = [];
+%         for k=1:ms100_slices
+%             start_i = ((k-1)*ms100_size)+1;
+%             end_i = k*ms100_size;
+%             slice_data = event_in_time(:, start_i:end_i);
+%             
+%             angle_amp_f = [];
+%             for l=1:2
+%                 if l==1
+%                     slice_ifft = abs(ifft(abs(slice_data)));
+%                 else
+%                     slice_ifft = abs(ifft(angle(slice_data)));
+%                 end
+%                 treated_ifft = mean(slice_ifft,2);
+%                 hist_out = histcounts(treated_ifft, size(treated_ifft, 1));
+%                 hist_out = hist_out(1,2:end);
+%                 energy_indexes = find(hist_out > 0);
+%                 multipaths = length(energy_indexes);
+%                 norm_hist_energies = energy_indexes.*hist_out(1, energy_indexes);
+%                 norm_hist_energies = imresize(norm_hist_energies, [1 20], 'nearest');
+%                 angle_amp_f(:,l) = norm_hist_energies;
+%             end
+%             event_iffts(k,:) = reshape(angle_amp_f, 1, []);
+%         end
+%         
+%         multipath_feature = reshape(event_iffts, 1, []);
+%         multipath_feature = imresize(multipath_feature, [1 1000], 'nearest');
+%         multipath_features(i,:) = multipath_feature;
+%     end
+    
     time_features = [];
     all_features = [];
     for i=1:length(events_indexes)
@@ -288,7 +386,7 @@ function [ all_features, energy_signatures, time_slice_features ] = extract_gait
         
         % Filter in 20-80Hz
         filtered_data = [];
-        freq_range = [20 80];
+        freq_range = [2 80];
         for m=1:size(event_in_time,2)
             [wt, f] = cwt(event_in_time(:,m), 'amor', frequency);
             filtered_data(m,:) = icwt(wt, f, freq_range, 'SignalMean', mean(event_in_time(:,m)));
@@ -350,7 +448,8 @@ function [ all_features, energy_signatures, time_slice_features ] = extract_gait
         %plot(time_slice_features.');
         reshaped_time_features = reshape(time_slice_features', 1, []);
         %reshaped_time_features = (reshaped_time_features - min(reshaped_time_features)) / ( max(reshaped_time_features) - min(reshaped_time_features) ) * (max(max(nons_csi)) /10);
-        event_features = [gait_features(i,:).'; reshaped_time_features.'].'; % all features
+        event_features = [gait_features(i,:).'; percentile_features(i,:).'; reshaped_time_features.'].'; % all features
+        %event_features = [gait_features(i,:).'; reshaped_time_features.'].'; % all features
         %event_features = gait_features(i,:); % Speed and spectrogram energy
         %event_features = reshape(energy_signatures(:,:, i), 1, []); % Only Spectrogram energy
         all_features(i,:) = event_features;

@@ -1,4 +1,4 @@
-plotData = 0;
+plotData = 1;
 labels = {};
 labels(1,:) = {'Saiu'};
 labels(2,:) = {'Entrou'};
@@ -7,8 +7,8 @@ datasets_struct = {{'csi_data_bruno_w_', [57 60], 1} {'csi_data_bruno_w_', [62 6
     {'csi_data_geovana_w_', [1 4], 2} {'csi_data_geovana_w_', [6 9], 2} {'csi_data_geovana_w_', [11 14], 2} ...
     {'csi_data_vinicius_w_', [11 14], 3} {'csi_data_vinicius_w_', [16 19], 3} {'csi_data_vinicius_w_', [21 24], 3} {'csi_data_vinicius_w_', [26 29], 3} ...
     {'csi_data_phelipe_w_', [1 4], 4} {'csi_data_phelipe_w_', [6 9], 4} {'csi_data_phelipe_w_', [11 14], 4} ...
-    {'csi_data_josenilton_w_', [1 4], 5} {'csi_data_josenilton_w_', [6 9], 5} {'csi_data_josenilton_w_', [11 14], 5} ...
-    {'csi_data_luan_w_', [1 4], 6} {'csi_data_luan_w_', [6 9], 6} {'csi_data_luan_w_', [11 14], 6} ...
+    {'csi_data_josenilton_w_', [1 4], 5} {'csi_data_josenilton_w_', [6 9], 5} {'csi_data_josenilton_w_', [11 14], 5} {'csi_data_josenilton_w_', [16 19], 5} ...
+    {'csi_data_luan_w_', [1 4], 6} {'csi_data_luan_w_', [6 9], 6} {'csi_data_luan_w_', [11 14], 6} {'csi_data_luan_w_', [16 19], 6} ...
     {'csi_data_pablo_w_', [1 4], 7} {'csi_data_pablo_w_', [6 9], 7} {'csi_data_pablo_w_', [11 14], 7} {'csi_data_pablo_w_', [16 19], 7} ...
     {'csi_data_marcelo_w_', [54 57], 8} {'csi_data_marcelo_w_', [59 62], 8} {'csi_data_marcelo_w_', [64 67], 8}};
 datasets = {};
@@ -28,7 +28,13 @@ train_set_val(datasets_size+1:datasets_size*2, 1) = 2;
 in_features = [];
 out_features = [];
 for i=1:size(datasets, 2)
+    if(exist(datasets{1,i}) == 0) 
+        splited_var = strsplit(datasets{1,i}, '_');
+        fileName = strcat('/home/bruno/gait_bruno_tests/gait_tests_', splited_var(1,3), '_dataset.mat');
+        load(fileName{:});
+    end
     dataset = eval(datasets{1,i});
+    clear(datasets{1,i});
     features = extract_gait_features(dataset, 800);
     out_features(i,:) = features(1,:);
     in_features(i,:) = features(2,:);
@@ -58,8 +64,8 @@ testsets_struct = {
     {'csi_data_geovana_w_', [5 5], 2} {'csi_data_geovana_w_', [10 10], 2} {'csi_data_geovana_w_', [15 15], 2} ...
     {'csi_data_vinicius_w_', [15 15], 3} {'csi_data_vinicius_w_', [20 20], 3} {'csi_data_vinicius_w_', [25 25], 3} {'csi_data_vinicius_w_', [30 30], 3}...
     {'csi_data_phelipe_w_', [5 5], 4} {'csi_data_phelipe_w_', [10 10], 4} {'csi_data_phelipe_w_', [15 15], 4} ...
-    {'csi_data_josenilton_w_', [5 5], 5} {'csi_data_josenilton_w_', [10 10], 5} {'csi_data_josenilton_w_', [15 15], 5} ...
-    {'csi_data_luan_w_', [5 5], 6} {'csi_data_luan_w_', [10 10], 6} {'csi_data_luan_w_', [15 15], 6} ...
+    {'csi_data_josenilton_w_', [5 5], 5} {'csi_data_josenilton_w_', [10 10], 5} {'csi_data_josenilton_w_', [15 15], 5} {'csi_data_josenilton_w_', [20 20], 5} ...
+    {'csi_data_luan_w_', [5 5], 6} {'csi_data_luan_w_', [10 10], 6} {'csi_data_luan_w_', [15 15], 6} {'csi_data_luan_w_', [20 20], 6} ...
     {'csi_data_pablo_w_', [5 5], 7} {'csi_data_pablo_w_', [10 10], 7} {'csi_data_pablo_w_', [15 15], 7} {'csi_data_pablo_w_', [20 20], 7} ...
     {'csi_data_marcelo_w_', [58 58], 8} {'csi_data_marcelo_w_', [63 63], 8} {'csi_data_marcelo_w_', [68 68], 8}};
 testsets = {};
@@ -79,7 +85,13 @@ test_set_val(testsets_size+1:testsets_size*2, 1) = 2;
 in_test_features = [];
 out_test_features = [];
 for i=1:size(testsets, 2)
+    if(exist(testsets{1,i}) == 0) 
+        splited_var = strsplit(testsets{1,i}, '_');
+        fileName = strcat('/home/bruno/gait_bruno_tests/gait_tests_', splited_var(1,3), '_dataset.mat');
+        load(fileName{:});
+    end
     testset = eval(testsets{1,i});
+    clear(testsets{1,i});
     features = extract_gait_features(testset, 800);
     out_test_features(i,:) = features(1,:);
     in_test_features(i,:) = features(2,:);

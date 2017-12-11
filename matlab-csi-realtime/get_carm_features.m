@@ -1,4 +1,4 @@
-function [ carm_features ] = get_carm_features( event_csi, event_slice, frequency )
+c ja function [ carm_features ] = get_carm_features( event_csi, event_slice, frequency )
     function [f] = calcule_features(signal, wavelet_level, frequency, num_secs)
         reshaped = (frequency/(2^(wavelet_level-1)))/5;
         f = [];
