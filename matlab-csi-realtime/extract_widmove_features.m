@@ -1,6 +1,5 @@
 function [ all_features, energy_signatures, time_slice_features, ...
-    spectrogram_data, event_pca ] = extract_gait_features( csi_data, frequency )
-
+    spectrogram_data, event_pca ] = extract_widmove_features( csi_data, frequency )
     csi_mag = abs(csi_data);
     nons_csi = (csi_mag - mean(csi_mag, 2)).';
     coeff= pca(nons_csi);
@@ -8,10 +7,6 @@ function [ all_features, energy_signatures, time_slice_features, ...
     
     % Create the spectrogram
     [ newS, f, t, cutoff20, cutoff50, cutoff100 ] = stft_spectrogram(csi_data, frequency);
-    %[ newS, f, t, cutoff20, cutoff50, cutoff100 ] = wavelet_spectrogram(csi_data, frequency);
-    
-    frame_time = (t(1,3) - t(1,2));
-    min_walk_frame_size = ceil(0.4/frame_time);
     
     % Calcule percentile
     percentile = [];
@@ -28,23 +23,13 @@ function [ all_features, energy_signatures, time_slice_features, ...
     event_len = 0;
     events = {};
     events_indexes = {};
-    
-    % Normalize Body energies between 0 and 1
-    bodyMoveEnergies = newS(cutoff20:cutoff50, :);
-    energyIndexes = find(bodyMoveEnergies > 0);
-    allEnergies = bodyMoveEnergies(energyIndexes);
-    maxEnergy = max(allEnergies);
-    minEnergy = min(allEnergies);
-    normEnergyVal = (allEnergies-minEnergy)/(maxEnergy-minEnergy);
-    bodyMoveEnergies(energyIndexes) = normEnergyVal;
-    all_energy_mean = mean(normEnergyVal);
-    
+    all_energy_mean = mean(mean(newS(cutoff20:cutoff50, :)))*1000;
     for j=1:size(percentile,2)
-        chunk_energy = sum(bodyMoveEnergies(:, j));
+        chunk_energy = sum(newS(cutoff20:cutoff50, j));
         if(chunk_energy > 0)
             event_len = event_len + 1;
         else
-            if(event_len < min_walk_frame_size)
+            if(event_len < 10)
                 % Event have no minimum duration, remove it
                 speed_curves(:,j-event_len:j) = 0;
                 event_len = 0;
@@ -54,7 +39,7 @@ function [ all_features, energy_signatures, time_slice_features, ...
                 start_i = 0;
                 end_i = 0;
                 for k=j-event_len:j-1
-                        smE = sum(bodyMoveEnergies(:,k));
+                        smE = sum(newS(cutoff20:cutoff50,k));
                         if(smE > 0)
                             end_i = k;
                             if(start_i == 0) 
@@ -64,18 +49,14 @@ function [ all_features, energy_signatures, time_slice_features, ...
                 end
                 
                 new_event = speed_curves(:, start_i:end_i);
-                event_energies = bodyMoveEnergies(:, start_i:end_i);
+                event_energies = newS(cutoff20:cutoff50, start_i:end_i);
+                slice_energy = sum(event_energies(find(event_energies > 0)))/all_energy_mean;
                 
-                slice_energy = mean(event_energies(find(event_energies > 0)))/all_energy_mean;
-                
-                % Get slices that have energy above than 80% of all
-                % energies mean
-                disp(slice_energy);
-                if(slice_energy >= 0.8)
+                if(slice_energy >= 0.5)
                     events = [events new_event];
                     events_indexes = [events_indexes [start_i end_i]];
-                    if(size([start_i:end_i], 2) < min_walk_frame_size)
-                        disp(strcat('SIZE < ', num2str(min_walk_frame_size)));
+                    if(size([start_i:end_i], 2) < 10)
+                        disp('SIZE < 10');
                     end
                 end
                 event_len = 0;
@@ -94,6 +75,8 @@ function [ all_features, energy_signatures, time_slice_features, ...
         
         last_energy = chunk_energy;
     end
+
+    frame_time = (t(1,3) - t(1,2));
 
     % Extract speed features
     speed_features = [];
@@ -125,30 +108,8 @@ function [ all_features, energy_signatures, time_slice_features, ...
         normalized_curve = legs_curve/max(abs(legs_curve));
         l_entropy = entropy(normalized_curve);
         
-        %features = [ t_mean t_max t_min t_skewness t_kurtosis t_var t_zcr t_entropy ...
         features = [ t_mean t_max t_min t_skewness t_kurtosis t_var t_entropy ...
             l_mean l_max l_min l_skewness l_kurtosis l_var l_entropy];
-        
-%         % Calcule torso cycle/s
-%         acf = autocorr(torso_curve);
-%         inverted = max(acf) - acf;
-%         disp(size(inverted));
-%         [~, indexes] = findpeaks(inverted);
-%         if(length(indexes) > 0)
-%             features(1,end+1) = (indexes(1,1)-1) * frame_time * 2;
-%         else
-%             features(1,end+1) = 0;
-%         end
-%         
-%         % Calcule legs cycle/s
-%         acf = autocorr(legs_curve);
-%         inverted = max(acf) - acf;
-%         [~, indexes] = findpeaks(inverted);
-%         if(length(indexes) > 0)
-%             features(1,end+1) = (indexes(1,1)-1) * frame_time * 2;
-%         else
-%             features(1,end+1) = 0;
-%         end
         
         speed_features(i,:) = features;
     end
@@ -182,22 +143,6 @@ function [ all_features, energy_signatures, time_slice_features, ...
         energy_signatures(i,:) = reshaped_energy;
     end
     
-%     % ONLY FOR EVENT RECOGNITION
-%     event_recog_features = [];
-%     for i=1:length(events_indexes)
-%         event = events_indexes{1,i};
-%         event_energy = newS(:, event(1,1):event(1,2));
-%         ft = [];
-%         for k=1:size(event_energy,1)
-%            ft(end+1) = mean(event_energy(k,:));
-%            ft(end+1) = var(event_energy(k,:));
-%            ft(end+1) = max(event_energy(k,:));
-%            ft(end+1) = min(event_energy(k,:));
-%         end
-%         event_recog_features(i,:) = ft;
-%     end
-%     % END EVENT RECOGNITION
-    
     % Get time domain features
     window_size = frame_time * frequency;
     
@@ -215,31 +160,6 @@ function [ all_features, energy_signatures, time_slice_features, ...
     nons_csi = (csi_mag - mean(csi_mag(:, otherwhise_indexes), 2)).';
     coeff= pca(nons_csi);
     pca_comps = nons_csi*coeff(:,1:20);
-    
-    %Calcule phase
-%     phases_features = [];
-%     for i=1:length(events_indexes)
-%         event = events_indexes{1,i};
-%         start_time = floor(window_size*event(1,1));
-%         end_time = ceil(window_size*event(1,2));
-%         event_in_time = csi_data(:, start_time:end_time).';
-%         event_size = size(event_in_time,1);
-%         event_in_time = event_in_time(1:(floor(event_size/10)*10),:);
-% 
-%         time_slice_features = [];
-%         for j=1:size(event_in_time, 2)
-%             relative_freq = size(event_in_time,1)/10;
-%             s_data = reshape(event_in_time(:,j), relative_freq, []).';
-%             for k=1:size(s_data, 1)
-%                 time_slice_features(end+1,:) = entropy(phase(s_data(k,:)));
-%             end
-%         end
-%         
-%         phase_feature = imresize(reshape(time_slice_features, 1, []), [1 500], 'nearest');
-%         phases_features(i,:) = phase_feature;
-%     end
-%     all_features = phases_features;
-%     return;
     
     % Percentile curve
     percentile_features = [];
@@ -273,56 +193,12 @@ function [ all_features, energy_signatures, time_slice_features, ...
         percentile_features(i,:) = reshape(percentile_curves, 1, []);
     end
     
-    % Multipath features
-%     multipath_features = [];
-%     for i=1:length(events_indexes)
-%         event = events_indexes{1,i};
-%         start_time = floor(window_size*event(1,1));
-%         end_time = ceil(window_size*event(1,2));
-%         event_in_time = csi_data(:, start_time:end_time);
-%         
-%         ms100_size = frequency/10;
-%         ms100_slices = floor(size(event_in_time,2)/ms100_size);
-%         event_in_time = event_in_time(:, 1:ms100_slices*ms100_size);
-%         event_iffts = [];
-%         for k=1:ms100_slices
-%             start_i = ((k-1)*ms100_size)+1;
-%             end_i = k*ms100_size;
-%             slice_data = event_in_time(:, start_i:end_i);
-%             
-%             angle_amp_f = [];
-%             for l=1:2
-%                 if l==1
-%                     slice_ifft = abs(ifft(abs(slice_data)));
-%                 else
-%                     slice_ifft = abs(ifft(angle(slice_data)));
-%                 end
-%                 treated_ifft = mean(slice_ifft,2);
-%                 hist_out = histcounts(treated_ifft, size(treated_ifft, 1));
-%                 hist_out = hist_out(1,2:end);
-%                 energy_indexes = find(hist_out > 0);
-%                 multipaths = length(energy_indexes);
-%                 norm_hist_energies = energy_indexes.*hist_out(1, energy_indexes);
-%                 norm_hist_energies = imresize(norm_hist_energies, [1 20], 'nearest');
-%                 angle_amp_f(:,l) = norm_hist_energies;
-%             end
-%             event_iffts(k,:) = reshape(angle_amp_f, 1, []);
-%         end
-%         
-%         multipath_feature = reshape(event_iffts, 1, []);
-%         multipath_feature = imresize(multipath_feature, [1 1000], 'nearest');
-%         multipath_features(i,:) = multipath_feature;
-%     end
-    
     time_features = [];
     all_features = [];
     for i=1:length(events_indexes)
         event = events_indexes{1,i};
         start_time = floor(window_size*event(1,1));
         end_time = ceil(window_size*event(1,2));
-%         start_time = floor(window_size*(event(1,1)-(1.5/frame_time)));
-%         end_time = ceil(window_size*(event(1,2)+(1.5/frame_time)));
-        %event_in_time = nons_csi(start_time:end_time, :);
         event_in_time = pca_comps(start_time:end_time, 2);
         
         % Start modification of fixed size
@@ -336,13 +212,10 @@ function [ all_features, energy_signatures, time_slice_features, ...
         centerIndex = start_time + centerIndex;
         event_pca = pca_comps(centerIndex-1600:centerIndex+1600, 2);
         event_in_time = pca_comps(centerIndex-1600:centerIndex+1600, 2:6);
-        % USE 2:6 to get best results
-        %event_in_time = pca_comps(start_time:end_time, 2);
-        % End modification of fixed size
+        %event_in_time = pca_comps(centerIndex-1600:centerIndex+1600, 2);
         
         event_size = size(event_in_time,1);
         event_in_time = event_in_time(1:(floor(event_size/10)*10),:);
-        %event_in_time = mean(event_in_time,2);
         
         % Filter in 20-80Hz
         filtered_data = [];
@@ -353,22 +226,6 @@ function [ all_features, energy_signatures, time_slice_features, ...
         end
         event_in_time = filtered_data';
         % End filter
-        
-        % Normalize filtered data
-        %event_in_time = event_in_time.^2;
-        %mean_event_time = mean(event_in_time, 2);
-        %min_event_time = min(event_in_time, [], 2);
-        %max_event_time = max(event_in_time, [], 2);
-        
-        %norm_data = bsxfun(@rdivide, (event_in_time - min_event_time), (max_event_time - min_event_time)) * 10;
-        %norm_data = event_in_time - mean_event_time;
-        %event_in_time = norm_data;
-        
-        %energy_level = sum(event_in_time,2);
-        %event_in_time = bsxfun(@rdivide, event_in_time, energy_level);
-        
-        %event_in_time = event_in_time - mean(event_in_time,1);
-        % end
         
         time_slice_features = [];
         for j=1:size(event_in_time, 2)
@@ -396,26 +253,13 @@ function [ all_features, energy_signatures, time_slice_features, ...
                 fft_freq = find(cp_fft == max(cp_fft(:)));
                 fft_freq = fft_freq(1,1);
 
-%                time_slice_features(end+1,:) = [c_mean/10, c_max/10, c_min/10, ...
-%                    c_skewness/10, c_kurtosis/10, c_var/10, c_zcr/10, c_entropy/10, c_energy/1000, fft_freq/10];
                 time_slice_features(end+1,:) = [c_mean, c_max, c_min, ...
                     c_skewness, c_kurtosis, c_var, c_zcr, c_entropy, c_energy/100, fft_freq];
             end
         end
         
-        %normalize kurtosis
-        %time_slice_features(:,5) = time_slice_features(:,5)/sum(time_slice_features(:,5)) * 10;
-        %time_features(:,:, i) = time_slice_features;
-        
-        %plot(time_slice_features.');
         reshaped_time_features = reshape(time_slice_features', 1, []);
         time_features(i,:) = reshaped_time_features;
-        
-        %reshaped_time_features = (reshaped_time_features - min(reshaped_time_features)) / ( max(reshaped_time_features) - min(reshaped_time_features) ) * (max(max(nons_csi)) /10);
-        %event_features = [gait_features(i,:).'; percentile_features(i,:).'; reshaped_time_features.'].'; % all features
-        %event_features = [gait_features(i,:).'; reshaped_time_features.'].'; % all features
-        %event_features = gait_features(i,:); % Speed and spectrogram energy
-        %event_features = reshape(energy_signatures(:,:, i), 1, []); % Only Spectrogram energy
         
         event_features = [event_durations(i,:).'; ...
             percentile_features(i,:).'; speed_features(i,:).'; ...
@@ -423,13 +267,5 @@ function [ all_features, energy_signatures, time_slice_features, ...
         all_features(i,:) = event_features;
     end
     
-    % 2.95ms && 3.71ms
-    % 2.35ms && 2.71ms
-    %
-%     figure;
-%     imagesc(t, f, newS);
-%     set(gca,'YDir','normal');
-    
     spectrogram_data = struct('stft', newS, 'time', t, 'frequency', f);
 end
-

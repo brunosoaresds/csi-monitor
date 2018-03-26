@@ -253,12 +253,30 @@ function requestRealTimeData(hObject, eventdata, handles)
         files = [];
     end
     
-    csiData = handles.csiData;    
+    csiData = handles.csiData;
+    csiDataCellIndex = ((str2num(get(handles.rx, 'String'))-1)*3) + str2num(get(handles.tx, 'String'));
     windowSize = str2num(get(handles.graph_window, 'String')) - 1;
+    
+    % Initialize allCsiData (i.e, all tx and rx data)
+    if isfield(handles, 'allCsiData') ~= 1 || isempty(handles.allCsiData)
+        allCsiData = {};
+        for i=1:9
+            allCsiData{1,i} = [];
+        end
+    else
+        allCsiData = handles.allCsiData;
+    end
+    
     for i=1:numel(files)
         try
-            csi = read_log_file(files{i});
-            csi = get_csi_streams(csi, 1, 1);
+            allCsi = read_log_file(files{i});
+            allCsi = get_csi_streams(allCsi);
+            % concat all csi data to export.
+            for k=1:9
+                allCsiData{1,k} = [allCsiData{1,k} allCsi{1,k}];
+            end
+            
+            csi = allCsi{1,csiDataCellIndex};
         catch ME
             csi = zeros(56,1);
         end
@@ -271,6 +289,7 @@ function requestRealTimeData(hObject, eventdata, handles)
     end
     
     handles = setfield(handles, 'csiData', csiData);
+    handles = setfield(handles, 'allCsiData', allCsiData);
     guidata(handles.csi_realtime_frame, handles);
     
     csiDataSize = size(csiData);
@@ -424,6 +443,10 @@ function clear_btn_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
     handles.csiData = {};
+    if isfield(handles, 'allCsiData')
+        handles = rmfield(handles, 'allCsiData');
+    end
+    
     fnctHandler = get(handles.csi_monitoring, 'ButtonDownFcn');
     cla(handles.csi_monitoring);
     set(handles.csi_monitoring, 'ButtonDownFcn', fnctHandler);
@@ -609,16 +632,20 @@ function export_btn_Callback(hObject, eventdata, handles)
 % hObject    handle to export_btn (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    if isfield(handles, 'csiData')
-        data = handles.csiData;
-        [~, n] = size(data);
-        for i=1:n
-            if data{1,i}(1,1) == 0
-                data{1,i} = [];
-            end
-        end
-        assignin('base', 'csi_data', cell2mat(data));
+    if isfield(handles, 'allCsiData')
+        assignin('base', 'csi_data', handles.allCsiData);
     end
+% Old export
+%     if isfield(handles, 'csiData')
+%         data = handles.csiData;
+%         [~, n] = size(data);
+%         for i=1:n
+%             if data{1,i}(1,1) == 0
+%                 data{1,i} = [];
+%             end
+%         end
+%         assignin('base', 'csi_data', cell2mat(data));
+%     end
 
 % --- Executes on mouse press over axes background.
 function csi_monitoring_ButtonDownFcn(hObject, eventdata, handles)

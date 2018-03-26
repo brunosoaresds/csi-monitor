@@ -24,7 +24,6 @@ for i=1:length(datasets_struct)
     x = datasets_struct{1,i};
     pattern = x{1,1};
     indexes = x{1,2};
-    label_id = x{1,3};
     for j=indexes(1,1):indexes(1,2)
         datasets = [datasets strcat(pattern, num2str(j))];
         entries_names(end+1) = label_id;
