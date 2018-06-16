@@ -11,7 +11,8 @@ function [ all_features, energy_signatures, time_slice_features, ...
     %[ newS, f, t, cutoff20, cutoff50, cutoff100 ] = wavelet_spectrogram(csi_data, frequency);
     
     frame_time = (t(1,3) - t(1,2));
-    min_walk_frame_size = ceil(0.4/frame_time);
+    min_walk_frame_size = ceil(1.2/frame_time);
+    window_size = frame_time * frequency;
     
     % Calcule percentile
     percentile = [];
@@ -30,7 +31,7 @@ function [ all_features, energy_signatures, time_slice_features, ...
     events_indexes = {};
     
     % Normalize Body energies between 0 and 1
-    bodyMoveEnergies = newS(cutoff20:cutoff50, :);
+    bodyMoveEnergies = newS(cutoff20:cutoff100, :);
     energyIndexes = find(bodyMoveEnergies > 0);
     allEnergies = bodyMoveEnergies(energyIndexes);
     maxEnergy = max(allEnergies);
@@ -68,10 +69,36 @@ function [ all_features, energy_signatures, time_slice_features, ...
                 
                 slice_energy = mean(event_energies(find(event_energies > 0)))/all_energy_mean;
                 
-                % Get slices that have energy above than 80% of all
-                % energies mean
-                disp(slice_energy);
-                if(slice_energy >= 0.8)
+                start_csi_i = floor(window_size*start_i);
+                start_csi_i = start_csi_i - 1600;
+                if start_csi_i <= 0
+                    start_csi_i = 1;
+                end
+                end_csi_i = ceil(window_size*end_i);
+                end_csi_i = end_csi_i + 1600;
+                if end_csi_i > size(nons_csi, 1)
+                    end_csi_i = size(nons_csi, 1);
+                end
+                
+                csi_e_data = nons_csi(start_csi_i:end_csi_i, :);
+                msframesize = (frequency/10);
+                duration_size = floor((end_csi_i-start_csi_i)/msframesize);
+                ev_vars = zeros(1, duration_size);
+                coeff_vars = zeros(size(csi_data,1)-1, duration_size);
+                for ev_i=1:duration_size
+                    msframe_start = ((ev_i-1) * msframesize)+1;
+                    msframe_end = ((ev_i) * msframesize);
+                    msframe_csi_data = csi_e_data(msframe_start:msframe_end,:);
+                    coeff_msframe = pca(msframe_csi_data);
+                    coeff_2nth_frame = coeff_msframe(:,2);
+                    pca_2nth = msframe_csi_data*coeff_2nth_frame;
+                    ev_vars(1,ev_i) = var(pca_2nth);
+                    for coefs_i=2:length(coeff_2nth_frame)
+                        coeff_vars(coefs_i-1, ev_i) = std([coeff_2nth_frame(coefs_i, 1) coeff_2nth_frame(coefs_i-1, 1)]);
+                    end
+                end
+                
+                if(slice_energy >= 0.5 && start_csi_i >= 1000)
                     events = [events new_event];
                     events_indexes = [events_indexes [start_i end_i]];
                     if(size([start_i:end_i], 2) < min_walk_frame_size)
@@ -94,7 +121,7 @@ function [ all_features, energy_signatures, time_slice_features, ...
         
         last_energy = chunk_energy;
     end
-
+    
     % Extract speed features
     speed_features = [];
     event_durations = [];
@@ -197,9 +224,6 @@ function [ all_features, energy_signatures, time_slice_features, ...
 %         event_recog_features(i,:) = ft;
 %     end
 %     % END EVENT RECOGNITION
-    
-    % Get time domain features
-    window_size = frame_time * frequency;
     
     % Calcule non events frames
     events_frames = [];
@@ -334,8 +358,16 @@ function [ all_features, energy_signatures, time_slice_features, ...
             centerIndex = find(event_in_time == min(event_in_time));
         end
         centerIndex = start_time + centerIndex;
-        event_pca = pca_comps(centerIndex-1600:centerIndex+1600, 2);
-        event_in_time = pca_comps(centerIndex-1600:centerIndex+1600, 2:6);
+        wid_start = centerIndex-1600;
+        wid_end = centerIndex+1600;
+        if(wid_start < 1)
+            wid_start = 1;
+        end
+        if(wid_end > size(pca_comps,1))
+            wid_end = size(pca_comps,1);
+        end
+        event_pca = pca_comps(wid_start:wid_end, 2);
+        event_in_time = pca_comps(wid_start:wid_end, 2:6);
         % USE 2:6 to get best results
         %event_in_time = pca_comps(start_time:end_time, 2);
         % End modification of fixed size

@@ -6,7 +6,6 @@ function [ newS, f, t, cutoff20, cutoff50, cutoff100 ] = stft_spectrogram( csi_d
     pca_comps = nons_csi*coeff(:,1:20);
     
     for i=1:size(pca_comps, 2)
-       
        [y,f,t,p] = spectrogram(pca_comps(:,i), 256, 155, [], frequency);
        %[y,f,t,p] = spectrogram(pca_comps(:,i), 1024, 758, [], frequency);
 
@@ -49,8 +48,8 @@ function [ newS, f, t, cutoff20, cutoff50, cutoff100 ] = stft_spectrogram( csi_d
        silence_p_indexes = find(p_power <  limiar_p);
        
        % Removes the noise floor
-       %y = y - mean(auxY(:,silence_y_indexes),2);
-       %p = p - mean(auxP(:,silence_p_indexes),2);
+       y = y - mean(auxY(:,silence_y_indexes),2);
+       p = p - mean(auxP(:,silence_p_indexes),2);
 
        % Normalize the energy by the division of energy per total of energy
        y = bsxfun(@rdivide, y, y_power);
@@ -61,7 +60,7 @@ function [ newS, f, t, cutoff20, cutoff50, cutoff100 ] = stft_spectrogram( csi_d
        % Removes the noise floor
        y = y - mean(y(:,silence_y_indexes),2);
        p = p - mean(p(:,silence_p_indexes),2);
-
+       
        % Remove silenced chunks
        y(:,silence_y_indexes) = 0;
        p(:,silence_p_indexes) = 0;
@@ -76,6 +75,14 @@ function [ newS, f, t, cutoff20, cutoff50, cutoff100 ] = stft_spectrogram( csi_d
            newS = y;
        end
     end
+    
+    % Normalize data between 0 and 1;
+    energyIndexes = find(newS > 0);
+    allEnergies = newS(energyIndexes);
+    maxEnergy = max(allEnergies);
+    minEnergy = min(allEnergies);
+    normEnergyVal = (allEnergies-minEnergy)/(maxEnergy-minEnergy);
+    newS(energyIndexes) = normEnergyVal;
     
     % Apply gaussian filter on spectrogram
     newS = imgaussfilt(newS, 0.8, 'FilterSize', 5);

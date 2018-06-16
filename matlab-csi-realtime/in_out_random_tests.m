@@ -13,7 +13,9 @@ datasets_struct = {{'csi_data_bruno_w_', [1 76], 1} ...
     {'csi_data_pablo_w_', [1 20], 7} ...
     {'csi_data_marcelo_w_', [1 68], 8}};
 
-datasets_struct = {{'csi_data_bruno_w_', [1 76], 1}};
+% datasets_struct = {{'csi_data_bruno_w_', [22 22], 1} ...
+%     {'csi_data_bruno_w_', [53 53], 1} {'csi_data_bruno_w_', [72 73], 1}};
+% datasets_struct = {{'csi_data_bruno_w_', [1 76], 1}};
 %datasets_struct = {{'csi_data_bruno_w_', [1 76], 1} ...
 %    {'csi_data_marcelo_w_', [1 68], 8}};
 
@@ -51,7 +53,7 @@ datasets_len = size(datasets,2);
         in_features(i,:) = features(2,:);
     end
 %end
-
+return;
 % Plot data if necessary
 if(plotData == 1)
     figure;
@@ -141,32 +143,31 @@ relieff_percents = [1 5 10 15 20 25 30 35 40 45 50 55 60 65 70 75 80 85 90 95 99
 relieff_percents = [100];
 accuracies = [];
 accuracies_lOO = [];
-figure;
-hold on;
+% figure;
+% hold on;
 for j=1:length(relieff_percents)
    rpercent = relieff_percents(1,j)/100;
    rank_all_set = all_set(:, ranked(1:floor(length(ranked)*rpercent)));
 
    %SVMModel = fitcecoc(rank_all_set, labels(all_labels), 'Learners', t, ...
    %    'FitPosterior', 1, 'ClassNames', labels.');
-   SVMModel = fitcecoc(rank_all_set, logical_labels, 'Learners', t, ...
-       'FitPosterior', 1);
+   SVMModel = fitcecoc(rank_all_set, logical_labels, 'Learners', t);
    CVSVMModel = crossval(SVMModel);
    CVSVMModel_lOO = crossval(SVMModel, 'KFold', size(rank_all_set,1));
    accuracies(:,j) = kfoldLoss(CVSVMModel, 'mode', 'individual');
    accuracies_lOO(:,j) = kfoldLoss(CVSVMModel_lOO, 'mode', 'individual');
    
-   % Create ROC curve
-   [~, score_svm] = resubPredict(SVMModel);
-   [Xsvm,Ysvm,Tsvm,AUCsvm] = perfcurve(logical_labels, score_svm(:, SVMModel.ClassNames), 'true');
-   plot(Xsvm,Ysvm);
+%    % Create ROC curve
+%    [~, score_svm] = resubPredict(SVMModel);
+%    [Xsvm,Ysvm,Tsvm,AUCsvm] = perfcurve(logical_labels, score_svm(:, SVMModel.ClassNames), 'true');
+%    plot(Xsvm,Ysvm);
    
    disp(strcat('Finished: ', num2str(rpercent)));
 end
 
-xlabel('False positive rate'); ylabel('True positive rate');
-title('ROC Curves for Logistic Regression, SVM, and Naive Bayes Classification');
-hold off;
+% xlabel('False positive rate'); ylabel('True positive rate');
+% title('ROC Curves for Logistic Regression, SVM, and Naive Bayes Classification');
+% hold off;
    
 %disp(size(all_set)); 
 disp('Kfold = 10:');

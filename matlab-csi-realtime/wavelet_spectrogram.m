@@ -10,10 +10,10 @@ function [ newS, freqs, sample_time, cutoff20, cutoff50, cutoff100 ] = wavelet_s
     sample_time = linspace(0, sample_duration, samples_len);
     for comp=1:size(pca_comps,2)
         [cfs, freqs] = cwt(pca_comps(:,comp), 'amor', frequency);
-        if(comp == 1)
-            figure;
-            cwt(pca_comps(:,comp), 'amor', frequency);
-        end
+%         if(comp == 1)
+%             figure;
+%             cwt(pca_comps(:,comp), 'amor', frequency);
+%         end
         % Find for the frequencies indexes
         % Define the frequency range cut-off for body movement
         if(exist('cutoff20') == 0)
@@ -49,28 +49,28 @@ function [ newS, freqs, sample_time, cutoff20, cutoff50, cutoff100 ] = wavelet_s
         energy(find(energy<0)) = 0;
         
         % Find body movement intervals
-        energy20hz = energy(cutoff20,:);
-        normEnergy = (energy20hz-min(energy20hz))/(max(energy20hz)-min(energy20hz));
+        %energy20hz = energy(cutoff20,:);
+        %normEnergy = (energy20hz-min(energy20hz))/(max(energy20hz)-min(energy20hz));
         
         % Remove noise floor (below to 12,5% of energy)
-        [~, noiseLocs] = find(normEnergy <= 0.125);
-        withoutNoiseEnergy = normEnergy;
-        withoutNoiseEnergy(noiseLocs) = 0;
-        [~, movementLocs] = find(withoutNoiseEnergy > 0);
+        %[~, noiseLocs] = find(normEnergy <= 0.125);
+        %withoutNoiseEnergy = normEnergy;
+        %withoutNoiseEnergy(noiseLocs) = 0;
+        %[~, movementLocs] = find(withoutNoiseEnergy > 0);
         
         % Group similar peaks
-        lastIndex = 0;
-        for i=movementLocs
-            if(lastIndex ~= 0 && (i-lastIndex) < (frequency/2))
-                withoutNoiseEnergy(1, lastIndex:i) = 1;
-            end
-            lastIndex = i;
-        end
+        %lastIndex = 0;
+        %for i=movementLocs
+        %    if(lastIndex ~= 0 && (i-lastIndex) < (frequency/2))
+        %        withoutNoiseEnergy(1, lastIndex:i) = 1;
+        %    end
+        %    lastIndex = i;
+        %end
         
         % Remove silenced indexes;
-        [~, movementLocs] = find(withoutNoiseEnergy > 0);
-        silencedLocs = setdiff(1:size(energy,2), movementLocs);
-        energy(:, silencedLocs) = 0;
+        %[~, movementLocs] = find(withoutNoiseEnergy > 0);
+        %silencedLocs = setdiff(1:size(energy,2), movementLocs);
+        %energy(:, silencedLocs) = 0;
         
         % Sum component spectrograms
         if(exist('newS'))
@@ -95,24 +95,25 @@ function [ newS, freqs, sample_time, cutoff20, cutoff50, cutoff100 ] = wavelet_s
     minEnergy = min(allEnergies);
     normEnergyVal = (allEnergies-minEnergy)/(maxEnergy-minEnergy);
     newS(energyIndexes) = normEnergyVal;
-    all_energy_mean = mean(normEnergyVal);
-    for i=1:size(newS,2)
-        chunkEnergies = newS(:,i)/all_energy_mean;
-        if(length(find(chunkEnergies < 0.1)) > 0)
-            newS(:,i) = 0;
-        end
-    end
+    % Remove silenced (no movement) slices.
+%     all_energy_mean = mean(normEnergyVal);
+%     for i=1:size(newS,2)
+%         chunkEnergies = newS(:,i)/all_energy_mean;
+%         if(length(find(chunkEnergies < 0.1)) > 0)
+%             newS(:,i) = 0;
+%         end
+%     end
     
     % Apply gaussian filter on spectrogram
     newS = imgaussfilt(newS, 0.8, 'FilterSize', 5);
     %imshow(newS, 'DisplayRange', [min(min(newS)) max(max(newS))]);
-    figure;
+    %figure;
     
     %freqs
     
-    imagesc(sample_time, freqs, newS);
+    %imagesc(sample_time, freqs, newS);
 %      imagesc(sample_time, log2(freqs), newS);
-     set(gca,'Ydir','normal');
+     %set(gca,'Ydir','normal');
 % 
 %     ax = gca;
 %     ytick = cellfun(@str2num, ax.YTickLabel);

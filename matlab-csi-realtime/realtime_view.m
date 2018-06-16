@@ -53,7 +53,7 @@ function realtime_view_OpeningFcn(hObject, eventdata, handles, varargin)
 
 % Start update job
 handles.timer = timer('ExecutionMode','fixedRate', ...
-                      'Period', 2, ...
+                      'Period', 3, ...
                       'TimerFcn', {@requestRealTimeData, handles});
 
 
@@ -268,6 +268,7 @@ function requestRealTimeData(hObject, eventdata, handles)
     end
     
     for i=1:numel(files)
+        disp(files{i});
         try
             allCsi = read_log_file(files{i});
             allCsi = get_csi_streams(allCsi);
