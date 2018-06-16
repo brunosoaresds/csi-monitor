@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 ### BEGIN INIT INFO
 # Provides: csi-device-manager
 # Required-Start: $network $named $remote_fs $syslog
@@ -25,21 +25,21 @@ do_start() {
 	    INTERFACE=""
 	    if [ -f $INTERFACE_ID_FILE ] ; then
             INTERFACE=$(cat $INTERFACE_ID_FILE)
-	        INTERFACE="$(echo -e "${INTERFACE}" | tr -d '[:space:]')"
+	        INTERFACE="$(echo "${INTERFACE}" | tr -d '[:space:]')"
 	    fi
 
 	    PORT=""
-	    if [ -f $PORT_ID_FILE ] ; then
+        if [ -f $PORT_ID_FILE ] ; then
             PORT=$(cat $PORT_ID_FILE)
-            PORT="$(echo -e "${PORT}" | tr -d '[:space:]')"
+            PORT="$(echo "${PORT}" | tr -d '[:space:]')"
         fi
 
         if [ "$INTERFACE" == "" ]
         then
-            echo "You must specify the WLan interface in ''${INTERFACE_ID_FILE}' file"
+            echo "You must specify the WLAN interface in ''${INTERFACE_ID_FILE}' file"
             exit 3
         else
-            $BIN $INTERFACE $PORT &
+            $BIN $INTERFACE $PORT > /dev/null 2>&1 &
             sleep 2
             echo "CSI Device Manager started!"
         fi

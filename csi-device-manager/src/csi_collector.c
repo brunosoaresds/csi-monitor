@@ -61,6 +61,7 @@ void *collect_csi_data(void *vargp) {
 
 void *files_cleaner(void *vargp) {
     char files_dir[512];
+    memset(&files_dir[0], 0, sizeof(files_dir));
     sprintf(files_dir, "%s/outputs", get_selfpath());
 
     // Create output directory if not exists
@@ -86,6 +87,7 @@ void *files_cleaner(void *vargp) {
 void *file_manager(void *vargp) {
     char file_name[512];
     char files_dir[512];
+    memset(&files_dir[0], 0, sizeof(files_dir));
     sprintf(files_dir, "%s/outputs", get_selfpath());
 
     /* wait until ready to init */
@@ -118,10 +120,14 @@ char *get_selfpath() {
     ssize_t len = readlink("/proc/self/exe", buff, sizeof(buff)-1);
 
     if (len != -1) {
-      // -9 because we need to remove the executable name
-      buff[len-9] = '\0';
-      sprintf(path, "%s",buff);
-      return path;
+        char * ptr = strrchr(buff, '/');
+        if(ptr != NULL) {
+            int cutlen = strlen(ptr);
+            buff[len-cutlen] = '\0';
+            sprintf(path, "%s",buff);
+        }
+
+        return path;
     }
 }
 
