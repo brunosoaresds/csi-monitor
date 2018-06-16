@@ -2,12 +2,13 @@
  * =====================================================================================
  *       Filename:  csi_fun.h
  *
- *    Description:  head file for csi processing fucntion  
+ *    Description:  head file for csi processing function
  *        Version:  1.0
  *
- *         Author:  Yaxiong Xie  
- *         Email :  <xieyaxiongfly@gmail.com>
- *   Organization:  WANDS group @ Nanyang Technological University
+ *         Author:  Yaxiong Xie, Bruno Soares da Silva
+ *         Email :  <xieyaxiongfly@gmail.com, brunodasilva@inf.ufg.br>
+ *   Organization:  WANDS group @ Nanyang Technological University,
+ *                  LABORA - Universidade Federal de Goiás (UFG) - Brazil
  *
  *   Copyright (c)  WANDS group @ Nanyang Technological University
  * =====================================================================================
@@ -50,4 +51,4 @@ void  close_csi_device(int fd);
 int   read_csi_buf(unsigned char* buf_addr,int fd, int BUFSIZE);
 void  record_status(unsigned char* buf_addr, int cnt, csi_struct* csi_status);
 void  record_csi_payload(unsigned char* buf_addr, csi_struct* csi_status,unsigned char* data_buf, COMPLEX(* csi_buf)[3][114]);
-void  porcess_csi(unsigned char* data_buf, csi_struct* csi_status,COMPLEX(* csi_buf)[3][114]);
+void  process_csi(unsigned char* data_buf, csi_struct* csi_status,COMPLEX(* csi_buf)[3][114]);

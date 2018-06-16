@@ -30,17 +30,21 @@ void sig_handler(int signo) {
 
 int main(int argc, char* argv[]) {
 	/* check usage */
-	if (argc != 3) {
-		printf("/*******************************************/\n");
-		printf("/*   Usage: recv_csi <port> <interface>    */\n");
-		printf("/*******************************************/\n");
+	if (argc < 2 || argc > 3) {
+		printf("/*****************************************************************/\n");
+		printf("/*   Usage: csi_device_manager <WLan interface> [port=3000]     */\n");
+		printf("/*****************************************************************/\n");
 		return 0;
 	}
 
 	/* Open socket server */
 	u_int16_t   csi_buf_len;
-	int port = atoi(argv[1]);
+	int port = 3000;
 	int serverfd = 0, clientfd = 0;
+
+	if(argc == 3) {
+        port = atoi(argv[2]);
+    }
 	
 	serverfd = create_server_sock(port);
 	if(serverfd == -1) {
@@ -57,7 +61,7 @@ int main(int argc, char* argv[]) {
 	char input_buffer[100];
 	unsigned int DstAddr[6];
 	int i, quantity_of_packets, until_seconds;
-	strcpy(ifName, argv[2]);
+	strcpy(ifName, argv[1]);
 
 	/* Create thread what will control the packet storage into file and the packet sender */
 	pthread_t tid_collector, tid_sender;
@@ -67,7 +71,7 @@ int main(int argc, char* argv[]) {
 	/* Client connection and command processing */
 	while(1) {
 		printf("Waiting for client connection...\n");
-		clientfd = wai_for_client(serverfd);
+		clientfd = wait_for_a_client(serverfd);
 		if(clientfd == -1) {
 			printf("Could not proceed with client connection, closing it...\n");
 			close(clientfd);

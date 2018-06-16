@@ -1,0 +1,4 @@
+csi_device_manager
+build/
+CMakeLists.txt
+outputs/

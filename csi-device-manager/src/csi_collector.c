@@ -35,7 +35,7 @@ void *collect_csi_data(void *vargp) {
     /* Create device reading */
     csi_device_fd = open_csi_device();
     if (csi_device_fd < 0) {
-        printf("Failed to open the CSI device...\n");
+        printf("Could not open CSI device, closing...\n");
         exit(0);
     }
 

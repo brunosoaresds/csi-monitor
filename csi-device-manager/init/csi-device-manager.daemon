@@ -1,0 +1,117 @@
+#! /bin/sh
+### BEGIN INIT INFO
+# Provides: csi-device-manager
+# Required-Start: $network $named $remote_fs $syslog
+# Required-Stop: $network $named $remote_fs $syslog
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: Csi Device Manager
+# Description: This file starts/stops the csi device manager
+#
+### END INIT INFO
+
+INSTALLATION_DIR=/opt/csi-device-manager
+BIN=$INSTALLATION_DIR/csi_device_manager
+INTERFACE_ID_FILE=$INSTALLATION_DIR/interface_id
+PORT_ID_FILE=$INSTALLATION_DIR/port_id
+
+do_start() {
+	PID=$(pgrep -fl "^(/.*)?${BIN}\s")
+
+	if [ "$PID" != "" ]
+	then
+		echo "CSI Device Manager already started!!!"
+	else
+	    INTERFACE=""
+	    if [ -f $INTERFACE_ID_FILE ] ; then
+            INTERFACE=$(cat $INTERFACE_ID_FILE)
+	        INTERFACE="$(echo -e "${INTERFACE}" | tr -d '[:space:]')"
+	    fi
+
+	    PORT=""
+	    if [ -f $PORT_ID_FILE ] ; then
+            PORT=$(cat $PORT_ID_FILE)
+            PORT="$(echo -e "${PORT}" | tr -d '[:space:]')"
+        fi
+
+        if [ "$INTERFACE" == "" ]
+        then
+            echo "You must specify the WLan interface in ''${INTERFACE_ID_FILE}' file"
+            exit 3
+        else
+            $BIN $INTERFACE $PORT &
+            sleep 2
+            echo "CSI Device Manager started!"
+        fi
+	fi
+}
+
+do_stop() {
+	PID=$(pgrep -fl "^(/.*)?${BIN}\s")
+
+	if [ "$PID" != "" ]
+	then
+		do_force_stop
+	else
+		echo "CSI Device Manager already stoped!!!"
+	fi
+}
+
+do_force_stop() {
+    pkill -f "^(/.*)?${BIN}\s"
+	sleep 2
+	echo "CSI Device Manager stopped!"
+}
+
+do_restart() {
+	PID=$(pgrep -fl "^(/.*)?${BIN}\s")
+
+	if [ "$PID" != "" ]
+	then
+		do_force_stop
+		do_start
+	else
+		do_start
+	fi
+}
+
+do_force_restart() {
+	do_force_stop
+	do_start
+}
+
+do_status() {
+	PID=$(pgrep -fl "^(/.*)?${BIN}\s")
+
+	if [ "$PID" != "" ]
+	then
+		echo "CSI Device Manager is running..."
+	else
+		echo "CSI Device Manager is not running!!!"
+	fi
+}
+
+case "$1" in
+	start)
+		do_start
+		;;
+	stop)
+		do_stop
+		;;
+	force-stop)
+		do_force_stop
+		;;
+	restart)
+		do_restart
+		;;
+	force-restart)
+		do_force_restart
+		;;
+	status)
+		do_status
+		;;
+	*)
+		echo "Usage: /etc/init.d/csi-device-manager ( start|stop|force-stop|restart|force-restart|status )" >&2
+		exit 3
+		;;
+esac

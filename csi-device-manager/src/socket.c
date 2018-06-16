@@ -52,7 +52,7 @@ int create_server_sock(int port) {
 	return serverfd;
 }
 
-int wai_for_client(int server_sock) {
+int wait_for_a_client(int server_sock) {
 	int clientfd = 0;
 	clientfd = accept(server_sock, (struct sockaddr*)NULL, NULL);
 	

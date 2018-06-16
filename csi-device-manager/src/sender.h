@@ -1,3 +1,17 @@
+/*
+ * =====================================================================================
+ *       Filename:  sender.h
+ *
+ *    Description:  Packets sender manager
+ *        Version:  1.0
+ *
+ *         Author:  Bruno Soares da Silva
+ *         Email :  <brunodasilva@inf.ufg.br>
+ *   Organization:  LABORA - Universidade Federal de Goiás (UFG) - Brazil
+ *
+ *   Copyright (c)  LABORA - Universidade Federal de Goiás (UFG) - Brazil
+ * =====================================================================================
+ */
 #define BUF_SIZE 2048
 #define TRUE 1
 #define FALSE 0
