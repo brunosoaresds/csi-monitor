@@ -4,7 +4,7 @@
 
 The CSI Monitor is a tool to configure, collect, monitor and dump, in real-time, the CSI measurements captured from Atheros 802.11n devices which uses the [Xie, et al](http://pdcc.ntu.edu.sg/wands/Atheros/) CSI Extraction tool.
 
-</img src="raw/master/docs/images/csi-monitor.png" width="70%">
+<img src="raw/master/docs/images/csi-monitor.png" width="70%">
 
 ## Installation guide
 
@@ -60,7 +60,7 @@ $ make install
 
 ### 4. How it works?
 
-</img src="raw/master/docs/images/csi-monitor-architecture.png" width="70%">
+<img src="raw/master/docs/images/csi-monitor-architecture.png" width="70%">
 
 ## 5. Contribute
 
