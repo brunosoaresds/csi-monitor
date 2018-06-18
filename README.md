@@ -4,8 +4,6 @@
 
 The CSI Monitor is a tool to configure, collect, monitor and dump, in real-time, the CSI measurements captured from Atheros 802.11n devices which uses the [Xie, et al](http://pdcc.ntu.edu.sg/wands/Atheros/) CSI Extraction tool.
 
-<img src="../../raw/master/docs/images/csi-monitor.png" width="70%">
-
 ## How it works?
 
 <img src="../../raw/master/docs/images/csi-monitor-architecture.png" width="70%">
@@ -92,6 +90,8 @@ $ hostapd -B scripts/hostapd<5|2.4>.conf
 **NOTE:** Chooses between the 2.4 and 5 Ghz config files. You can change the network SSID and password by changing the **ssid** and **wpa_passphrase** configurations.
 
 ## Monitor GUI parameters
+
+<img src="../../raw/master/docs/images/csi-monitor.png" width="60%">
 
 | Parameter | Description |
 | --- | --- |
