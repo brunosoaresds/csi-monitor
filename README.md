@@ -16,7 +16,7 @@ The monitor GUI was tested in **Ubuntu 16.04 LTS** and in **Debian 8**. Because 
 
 ## Installing dependencies
 
-## 802.11n devices dependencies (csi-device-manager)
+### 802.11n devices dependencies (csi-device-manager)
 
 - Installs [Atheros 802.11n CSI Extraction tool [Xie, et al]](http://pdcc.ntu.edu.sg/wands/Atheros/) on both sender and receiver devices. 
 - Installs distribution dependencies:
