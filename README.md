@@ -10,7 +10,7 @@ The CSI Monitor is a tool to configure, collect, monitor and dump, in real-time,
 
 ### 1. Supported Operational Systems
 
-The csi-device-manager was tested on **Ubuntu 14.04 LTS**. Any other operational system support will be on your own. If you can successfully used thi tool in another distribution, please tell us, that maybe helps another person in our community.
+The csi-device-manager was tested on **Ubuntu 14.04 LTS**. Any other operational system support will be on your own. If you can successfully uses this tool in another distribution, please tell us, that maybe helps another person in our community.
 
 The monitor GUI was tested in **Ubuntu 16.04 LTS** and in **Debian 8**. Because of the linux commands that runs in the python service, its probably that the monitor GUI will only run on linux systems. Feel free to modify the **CsiDMClient** to make it supports other operational systems. Don't forgot to make a Pull Request :).  
 
