@@ -54,11 +54,14 @@ install:
 		cp $(DAEMON_FILE_PATH) $(INIT_FILE_PATH); \
 		read -p "Enter WLAN interface that the CSI Device manager will manage:" interface_in; \
 		echo "$$interface_in" > $(INTERFACE_ID_FILE); \
-		read -p "Enter the socket port to be used (Default/Enter: 3000):" port_in; \
+		read -p "Enter the server port to be used (Default/Enter: 3000):" port_in; \
 		echo "$$port_in" > $(PORT_ID_FILE); \
 		mkdir $(INSTALLATION_OUTPUT_FILES_DIR); \
 		chmod a+x $(INIT_FILE_PATH); \
 		update-rc.d csi-device-manager defaults; \
-		echo "Installation done :)! if you need to change socket port or WLAN interface, please change '$(PORT_ID_FILE)' and '$(INTERFACE_ID_FILE)' files."; \
+		echo "========== Congratulations!! =========="; \
+		echo "======== Installation done :) ========="; \
+		echo ˜If you need to change server port or WLAN interface, please change '$(PORT_ID_FILE)' and '$(INTERFACE_ID_FILE)' files."; \
 		echo "You can start the service running $(INIT_FILE_PATH) start"; \
+		echo "============== All done! =============="; \
 	fi
