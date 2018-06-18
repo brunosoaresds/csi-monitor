@@ -91,7 +91,7 @@ $ hostapd -B scripts/hostapd<5|2.4>.conf
 
 ## Monitor GUI parameters
 
-<img src="../../raw/master/docs/images/csi-monitor.png" width="60%">
+<img src="../../raw/master/docs/images/csi-monitor.png" width="70%">
 
 | Parameter | Description |
 | --- | --- |
