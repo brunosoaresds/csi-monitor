@@ -117,8 +117,6 @@ Contributions are welcome, the process is simple as cloning, making changes and 
 
 This tool was developed inside a master degree work named **Sensing Human Movement Activities using IEEE 802.11n Interfaces**. To cite us, please refer the CCECE 2018 paper named "WiDMove: Sensing Movement Direction using IEEE 802.11n Interfaces".
 
-To understand better this work and get our dataset, please visit [https://brunosoaresds.github.io/widmove/](https://brunosoaresds.github.io/widmove/).
-
 ### BibTeX
 
 ```
@@ -131,3 +129,5 @@ To understand better this work and get our dataset, please visit [https://brunos
   organization={IEEE}
 }
 ```
+
+To understand better this work and get our dataset, please visit [https://brunosoaresds.github.io/widmove/](https://brunosoaresds.github.io/widmove/).
