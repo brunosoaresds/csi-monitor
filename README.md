@@ -115,7 +115,7 @@ Contributions are welcome, the process is simple as cloning, making changes and 
 
 ## Cite this tool
 
-This tool was developed inside a master degree work named **Sensing Movement using IEEE 802.11n Interfaces**. To cite us, please refer the CCECE 2018 paper named "WiDMove: Sensing Movement Direction using IEEE 802.11n Interfaces".
+This tool was developed inside a master degree work named **Sensing Human Movement Activities using IEEE 802.11n Interfaces**. To cite us, please refer the CCECE 2018 paper named "WiDMove: Sensing Movement Direction using IEEE 802.11n Interfaces".
 
 ### BibTeX
 
