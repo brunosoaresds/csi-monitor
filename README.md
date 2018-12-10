@@ -120,13 +120,15 @@ This tool was developed inside a master degree work named **Sensing Human Moveme
 ### BibTeX
 
 ```
-@inproceedings{dasilva2018widmove,
-  title={WiDMove: Sensing Movement Direction Using IEEE 802.11 n Interfaces},
-  author={Silva, Bruno Soaresda and TeodoroLaureano, Gustavo and Abdallah, Abdallah S and VieiraCardoso, Kleber},
-  booktitle={2018 IEEE Canadian Conference on Electrical \& Computer Engineering (CCECE)},
-  pages={1--4},
-  year={2018},
-  organization={IEEE}
+@INPROCEEDINGS{dasilva2018widmove, 
+  title={WiDMove: Sensing Movement Direction Using IEEE 802.11n Interfaces}, 
+  author={B. S. da Silva and G. T. Laureano and A. S. Abdallah and K. V. Cardoso}, 
+  booktitle={2018 IEEE Canadian Conference on Electrical Computer Engineering (CCECE)}, 
+  year={2018}, 
+  pages={1-4}, 
+  doi={10.1109/CCECE.2018.8447627}, 
+  ISSN={2576-7046}, 
+  month={May}
 }
 ```
 
