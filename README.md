@@ -2,7 +2,7 @@
 
 ## What is it?
 
-The CSI Monitor is a tool to configure, collect, monitor and dump, in real-time, the CSI measurements captured from Atheros 802.11n devices which uses the [Xie, et al](http://pdcc.ntu.edu.sg/wands/Atheros/) CSI Extraction tool.
+The CSI Monitor is a tool to configure, collect, monitor and dump, in real-time, the CSI measurements captured from Atheros 802.11n devices which uses the [Xie, et al](http://wands.sg/research/wifi/AtherosCSI/) CSI Extraction tool.
 
 ## How it works?
 
@@ -18,7 +18,7 @@ The monitor GUI was tested in **Ubuntu 16.04 LTS** and in **Debian 8**. Because 
 
 ### 802.11n devices dependencies (csi-device-manager)
 
-- Installs [Atheros 802.11n CSI Extraction tool [Xie, et al]](http://pdcc.ntu.edu.sg/wands/Atheros/) on both sender and receiver devices. 
+- Installs [Atheros 802.11n CSI Extraction tool [Xie, et al]](http://wands.sg/research/wifi/AtherosCSI/) on both sender and receiver devices. 
 - Installs distribution dependencies:
 
 ```
