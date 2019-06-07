@@ -61,7 +61,7 @@ install:
 		update-rc.d csi-device-manager defaults; \
 		echo "========== Congratulations!! =========="; \
 		echo "======== Installation done :) ========="; \
-		echo ˜If you need to change server port or WLAN interface, please change '$(PORT_ID_FILE)' and '$(INTERFACE_ID_FILE)' files."; \
+		echo "If you need to change server port or WLAN interface, please change '$(PORT_ID_FILE)' and '$(INTERFACE_ID_FILE)' files."; \
 		echo "You can start the service running $(INIT_FILE_PATH) start"; \
 		echo "============== All done! =============="; \
 	fi
