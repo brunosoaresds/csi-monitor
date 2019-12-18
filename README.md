@@ -31,6 +31,7 @@ $ apt-get install gcc cmake linux-headers ntp
 ### CSI Monitor GUI dependencies
 
 - Installs MATLAB, version 2017a+
+- Installs Intrument Control Toolbox on the matlab (make sure that tcpip function is working). Thanks @josemanjarrez92
 - Installs python 2.7
 - Installs SSH client
 
@@ -74,7 +75,7 @@ After this process, test if the ssh without password works, if it works, we are 
 
 #### Configuring/Opening Monitor GUI
 
-This process is very simple, just open the matlab, include csi-monitor-gui folder in the workspace and run **csi_monitor_gui** command.
+This process is very simple, just open the matlab, include csi-monitor-gui folder in the workspace and run **realtime_view** command.
 
 Assuming that you already have the csi-device-manager running in both sender and receiver and you have an established network between this two devices, you are ready to use the monitor GUI, otherwise proceed to the next session. Enjoy!
 
