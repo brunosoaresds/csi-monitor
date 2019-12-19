@@ -1,26 +1,26 @@
-function varargout = csi_monitor_gui(varargin)
-% CSI Monitor GUI MATLAB code for csi_monitor_gui.fig
-%      csi_monitor_gui, by itself, creates a new csi_monitor_gui or raises the existing
+function varargout = realtime_view(varargin)
+% CSI Monitor GUI MATLAB code for realtime_view.fig
+%      realtime_view, by itself, creates a new realtime_view or raises the existing
 %      singleton*.
 %
-%      H = csi_monitor_gui returns the handle to a new csi_monitor_gui or the handle to
+%      H = realtime_view returns the handle to a new realtime_view or the handle to
 %      the existing singleton*.
 %
-%      csi_monitor_gui('CALLBACK',hObject,eventData,handles,...) calls the local
-%      function named CALLBACK in csi_monitor_gui.M with the given input arguments.
+%      realtime_view('CALLBACK',hObject,eventData,handles,...) calls the local
+%      function named CALLBACK in realtime_view.M with the given input arguments.
 %
-%      csi_monitor_gui('Property','Value',...) creates a new csi_monitor_gui or raises the
+%      realtime_view('Property','Value',...) creates a new realtime_view or raises the
 %      existing singleton*.  Starting from the left, property value pairs are
-%      applied to the GUI before csi_monitor_gui_OpeningFcn gets called.  An
+%      applied to the GUI before realtime_view_OpeningFcn gets called.  An
 %      unrecognized property name or invalid value makes property application
-%      stop.  All inputs are passed to csi_monitor_gui_OpeningFcn via varargin.
+%      stop.  All inputs are passed to realtime_view_OpeningFcn via varargin.
 %
 %      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
 %      instance to run (singleton)".
 %
 % See also: GUIDE, GUIDATA, GUIHANDLES
 
-% Edit the above text to modify the response to help csi_monitor_gui
+% Edit the above text to modify the response to help realtime_view
 
 % Last Modified by GUIDE v2.5 27-Mar-2017 18:04:30
 
@@ -28,8 +28,8 @@ function varargout = csi_monitor_gui(varargin)
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
                    'gui_Singleton',  gui_Singleton, ...
-                   'gui_OpeningFcn', @csi_monitor_gui_OpeningFcn, ...
-                   'gui_OutputFcn',  @csi_monitor_gui_OutputFcn, ...
+                   'gui_OpeningFcn', @realtime_view_OpeningFcn, ...
+                   'gui_OutputFcn',  @realtime_view_OutputFcn, ...
                    'gui_LayoutFcn',  [] , ...
                    'gui_Callback',   []);
 if nargin && ischar(varargin{1})
@@ -43,13 +43,13 @@ else
 end
 % End initialization code - DO NOT EDIT
 
-% --- Executes just before csi_monitor_gui is made visible.
-function csi_monitor_gui_OpeningFcn(hObject, eventdata, handles, varargin)
+% --- Executes just before realtime_view is made visible.
+function realtime_view_OpeningFcn(hObject, eventdata, handles, varargin)
 % This function has no output args, see OutputFcn.
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-% varargin   command line arguments to csi_monitor_gui (see VARARGIN)
+% varargin   command line arguments to realtime_view (see VARARGIN)
 
 % Start update job
 handles.timer = timer('ExecutionMode','fixedRate', ...
@@ -57,19 +57,19 @@ handles.timer = timer('ExecutionMode','fixedRate', ...
                       'TimerFcn', {@requestRealTimeData, handles});
 
 
-% Choose default command line output for csi_monitor_gui
+% Choose default command line output for realtime_view
 handles.output = hObject;
 handles.filterNum = 0;
 
 % Update handles structure
 guidata(hObject, handles);
 
-% UIWAIT makes csi_monitor_gui wait for user response (see UIRESUME)
+% UIWAIT makes realtime_view wait for user response (see UIRESUME)
 % uiwait(handles.csi_realtime_frame);
 
         
 % --- Outputs from this function are returned to the command line.
-function varargout = csi_monitor_gui_OutputFcn(hObject, eventdata, handles) 
+function varargout = realtime_view_OutputFcn(hObject, eventdata, handles) 
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
